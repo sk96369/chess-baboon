@@ -43,3 +43,29 @@ impl fmt::Display for Move {
         write!(f, "{}", self.move_str)
     }
 }
+
+#[test]
+fn correct_notation() {
+    Move::from("f4f5")?;
+    Move::from("f5xg6")?;
+    Move::from("Rb1b7")?;
+}
+
+#[test]
+fn correct_short_notation() {
+    Move::from("f5")?;
+    Move::from("fxg6")?;
+    Move::from("Rc2")?;
+    Move::from("c1=Q")?;
+}
+
+#[test]
+fn incorrect_notation() {
+    Move::from("y4f5")?;
+    Move::from("f5xxg6")?;
+    Move::from("Rb1b9")?;
+    Move::from("Cb1b8")?;
+    Move::from("8")?;
+    Move::from("b")?;
+    Move::from("Q")?;
+}
