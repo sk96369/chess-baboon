@@ -46,26 +46,26 @@ impl fmt::Display for Move {
 
 #[test]
 fn correct_notation() {
-    Move::from("f4f5")?;
-    Move::from("f5xg6")?;
-    Move::from("Rb1b7")?;
+    assert_ne!(Move::from("f4f5"), NotationError);
+    assert_ne!(Move::from("f5xg6"), NotationError);
+    assert_ne!(Move::from("Rb1b7"), NotationError);
 }
 
 #[test]
 fn correct_short_notation() {
-    Move::from("f5")?;
-    Move::from("fxg6")?;
-    Move::from("Rc2")?;
-    Move::from("c1=Q")?;
+    assert_ne!(Move::from("f5"), NotationError);
+    assert_ne!(Move::from("fxg6"), NotationError);
+    assert_ne!(Move::from("Rc2"), NotationError);
+    assert_ne!(Move::from("c1=Q"), NotationError);
 }
 
 #[test]
 fn incorrect_notation() {
-    Move::from("y4f5")?;
-    Move::from("f5xxg6")?;
-    Move::from("Rb1b9")?;
-    Move::from("Cb1b8")?;
-    Move::from("8")?;
-    Move::from("b")?;
-    Move::from("Q")?;
+    assert_eq!(NotationError, Move::from("y4f5"));
+    assert_eq!(NotationError, Move::from("f5xxg6"));
+    assert_eq!(NotationError, Move::from("Rb1b9"));
+    assert_eq!(NotationError, Move::from("Cb1b8"));
+    assert_eq!(NotationError, Move::from("8"));
+    assert_eq!(NotationError, Move::from("b"));
+    assert_eq!(NotationError, Move::from("Q"));
 }
