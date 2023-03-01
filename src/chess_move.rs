@@ -8,29 +8,34 @@ pub struct Move {
 }
 
 impl From<String> for Move {
-    fn from(value: String) -> Result<Self, ChessError> {
+    fn from(value: String) -> Result<Self, NotationError> {
         let mut new_move = Move {
-            move_str: String::new(),
+            piece: Pawn,
+            move_str: value,
             start_col: None,
             start_row: None,
             end: None,
             takes: false,
-        });
-        let mut it = value.chars();
-        if let Some(c) = it.next() {
-            
+        };
 
-                
+        let mut it = value.chars().rev();
+        it.skip_while(|c| &c.is_uppercase() || !&c.is_alphanumeric());
+
+        if let Some(d) = it.next() {
+            if let Some(c) = it.next() {
+                new_move.end = Some((c - 'a', d - '0'));
+            }
+        }
+
+
+
+        }
 
     }
 }
 
 impl From<&str> for Move {
-    fn from(value: &str) -> Self {
-        Move {
-            move_str: value.to_string(),
-        }
-    }
+    
 }
 
 impl fmt::Display for Move {

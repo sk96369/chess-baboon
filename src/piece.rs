@@ -6,7 +6,6 @@ pub enum Piece {
     Rook,
     Bishop,
     Knight,
-    PawnStart,
     Pawn,
 }
 
