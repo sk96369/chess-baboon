@@ -1,4 +1,4 @@
-
+use crate::types::ChessError;
 
 pub enum Piece {
     King,
@@ -10,14 +10,14 @@ pub enum Piece {
 }
 
 impl From for Piece {
-    fn from(c: char) -> Result<Self, NotationError> {
+    fn from(c: char) -> Result<Self, ChessError> {
         match c {
-            'K' => King,
-            'Q' => Queen,
-            'R' => Rook,
-            'B' => Bishop,
-            'N' => Knight,
-            _ => NotationError,
+            'K' => Ok(Self::King),
+            'Q' => Ok(Self::Queen),
+            'R' => Ok(Self::Rook),
+            'B' => Ok(Self::Bishop),
+            'N' => Ok(Self::Knight),
+            _ => ChessError::NotationError,
         }
     }
 }

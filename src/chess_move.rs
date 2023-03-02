@@ -1,3 +1,6 @@
+use crate::{types::{ChessError::{self, NotationError}, ColRow}, piece::Piece::{self, Pawn}};
+use std::fmt;
+
 pub struct Move {
     piece: Piece,
     move_str: String,
@@ -8,7 +11,7 @@ pub struct Move {
 }
 
 impl From<String> for Move {
-    fn from(value: String) -> Result<Self, NotationError> {
+    fn from(value: String) -> Result<Self, ChessError> {
         let mut new_move = Move {
             piece: Pawn,
             move_str: value,
@@ -21,13 +24,34 @@ impl From<String> for Move {
         let mut it = value.chars().rev();
         it.skip_while(|c| &c.is_uppercase() || !&c.is_alphanumeric());
 
-        if let Some(d) = it.next() {
-            if let Some(c) = it.next() {
-                new_move.end = Some((c - 'a', d - '0'));
+        let d = it.next()?;
+        let c = it.next()?;
+        new_move.end = Some((c - 'a', d - '0'));
+
+        if let Some(c) = it.next() {
+            if c == 'x' {
+                new_move.takes = true;
+                //If the move takes, but nothing precedes x in the notation, an error is returned
+                c = it.next()?;
             }
-        }
-
-
+            if c.is_digit(10) {
+                new_move.start_row = Some(c - '0' - 1);
+                //If the starting row is specified, a column (for pawn) or a piece type specifier
+                //can be assumed
+                c = it.next()?;
+            }
+            if c.is_uppercase() {
+                new_move.piece = Piece::from(c)?;
+            } else {
+                if c.is_lowercase() {
+                    new_move.start_col = Some(c - 'a');
+                    if let Some(c) = it.next() {
+                        new_move.piece = Piece::from(c)?;
+                    }
+                } else {
+                    NotationError
+                }
+            }
 
         }
 
