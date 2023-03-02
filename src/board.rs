@@ -7,7 +7,7 @@ pub struct BoardState {
 impl BoardState {
     pub fn new() -> Self {
         BoardState {
-            squares: 
+            squares: vec![
         }
     }
 

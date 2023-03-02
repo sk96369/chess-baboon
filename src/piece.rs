@@ -9,15 +9,15 @@ pub enum Piece {
     Pawn,
 }
 
-impl From for Piece {
-    fn from(c: char) -> Result<Self, ChessError> {
-        match c {
+impl Piece {
+    fn from(item: char) -> Result<Self, ChessError> {
+        match item {
             'K' => Ok(Self::King),
             'Q' => Ok(Self::Queen),
             'R' => Ok(Self::Rook),
             'B' => Ok(Self::Bishop),
             'N' => Ok(Self::Knight),
-            _ => ChessError::NotationError,
+            _ => Err(ChessError::NotationError),
         }
     }
 }
