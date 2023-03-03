@@ -1,26 +1,17 @@
 use crate::{types::{ChessError::{self, NotationError}, ColRow}, piece::Piece::{self, Pawn}};
 use std::fmt;
 
+#[derive(Debug, PartialEq)]
 pub struct Move {
-    piece: Piece,
-    move_str: String,
-    start_col: Option<i8>,
-    start_row: Option<i8>,
-    end: Option<ColRow>,
-    takes: bool,
+    pub piece: Piece,
+    pub move_str: String,
+    pub start_col: Option<i8>,
+    pub start_row: Option<i8>,
+    pub end: Option<ColRow>,
+    pub takes: bool,
 }
 
-trait Movable<T>: Sized {
-    fn from(value: T) -> Result<Self, ChessError>;
-}
-
-impl Movable<&str> for Move {
-    fn from(value: &str) -> Result<Self, ChessError> {
-        from(value.to_string())
-    }
-}
-
-impl Movable<String> for Move {
+impl Move {
     fn from(value: String) -> Result<Self, ChessError> {
         let mut new_move = Move {
             piece: Pawn,
@@ -34,8 +25,8 @@ impl Movable<String> for Move {
         let mut it = value.chars().rev();
         it.skip_while(|c| c.is_uppercase() || !&c.is_alphanumeric());
 
-        let d = it.next()?;
-        let c = it.next()?;
+        let d = it.next().ok_or(NotationError)?;
+        let c = it.next().ok_or(NotationError)?;
         new_move.end = Some((c as i8 - 'a' as i8, d as i8 - '0' as i8));
 
         if let Some(c) = it.next() {
@@ -57,23 +48,25 @@ impl Movable<String> for Move {
                 };
             }
             if c.is_uppercase() {
-                new_move.piece = match Piece::from(c) {
-                    Piece => ,
-                    Err(e) => return e,
+                new_move.piece = match Piece::char_to_piece(c) {
+                    Ok(p) => p,
+                    Err(e) => return Err(e),
                 }
             } else {
                 if c.is_lowercase() {
-                    new_move.start_col = Some(c - 'a');
+                    new_move.start_col = Some(c as i8 - 'a' as i8);
                     if let Some(c) = it.next() {
-                        new_move.piece = Piece::from(c)?;
+                        new_move.piece = match Piece::char_to_piece(c) {
+                            Ok(p) => p,
+                            Err(e) => return Err(e),
+                        }
                     }
                 } else {
-                    NotationError
+                    return Err(NotationError)
                 }
             }
-
         }
-
+        Ok(new_move)
     }
 }
 
@@ -83,28 +76,81 @@ impl fmt::Display for Move {
     }
 }
 
-#[test]
-fn correct_notation() {
-    assert_ne!(Move::from("f4f5"), NotationError);
-    assert_ne!(Move::from("f5xg6"), NotationError);
-    assert_ne!(Move::from("Rb1b7"), NotationError);
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn correct_notation() {
+        assert_ne!(Move::from("f4f5".to_string()).unwrap(), Move {
+            piece: Pawn,
+            move_str: "f4f5".to_string(),
+            start_col: Some(5),
+            start_row: Some(3),
+            takes: false,
+            end: Some((5, 4))
+        });
+        assert_ne!(Move::from("f5xg6".to_string()).unwrap(), Move {
+            piece: Pawn,
+            move_str: "f5xg6".to_string(),
+            start_col: Some(5),
+            start_row: Some(4),
+            takes: false,
+            end: Some((6, 5))
+        });
+        assert_ne!(Move::from("Rb1b7".to_string()).unwrap(), Move {
+            piece: Piece::Rook,
+            move_str: "Rb1b7".to_string(),
+            start_col: Some(1),
+            start_row: Some(0),
+            takes: false,
+            end: Some((1, 6))
+        });
+    }
 
-#[test]
-fn correct_short_notation() {
-    assert_ne!(Move::from("f5"), NotationError);
-    assert_ne!(Move::from("fxg6"), NotationError);
-    assert_ne!(Move::from("Rc2"), NotationError);
-    assert_ne!(Move::from("c1=Q"), NotationError);
-}
+    #[test]
+    fn correct_short_notation() {
+        assert_eq!(Move::from("f5".to_string()).unwrap(), Move {
+            piece: Pawn,
+            move_str: "f5".to_string(),
+            start_col: None,
+            start_row: None,
+            takes: false,
+            end: Some((5, 4))
+        });
+        assert_eq!(Move::from("fxg6".to_string()).unwrap(), Move {
+            piece: Pawn,
+            move_str: "f5".to_string(),
+            start_col: Some(5),
+            start_row: None,
+            takes: false,
+            end: Some((6, 5))
+        });
+        assert_eq!(Move::from("Rc2".to_string()).unwrap(), Move {
+            piece: Piece::Rook,
+            move_str: "Rc2".to_string(),
+            start_col: None,
+            start_row: None,
+            takes: false,
+            end: Some((5, 5))
+        });
+        assert_eq!(Move::from("c1=Q".to_string()).unwrap(), Move {
+            piece: Pawn,
+            move_str: "f5".to_string(),
+            start_col: None,
+            start_row: None,
+            takes: false,
+            end: Some((5, 5))
+        });
+    }
 
-#[test]
-fn incorrect_notation() {
-    assert_eq!(NotationError, Move::from("y4f5"));
-    assert_eq!(NotationError, Move::from("f5xxg6"));
-    assert_eq!(NotationError, Move::from("Rb1b9"));
-    assert_eq!(NotationError, Move::from("Cb1b8"));
-    assert_eq!(NotationError, Move::from("8"));
-    assert_eq!(NotationError, Move::from("b"));
-    assert_eq!(NotationError, Move::from("Q"));
+    #[test]
+    fn incorrect_notation() {
+        assert_eq!(Err(NotationError), Move::from("y4f5".to_string()));
+        assert_eq!(Err(NotationError), Move::from("f5xxg6".to_string()));
+        assert_eq!(Err(NotationError), Move::from("Rb1b9".to_string()));
+        assert_eq!(Err(NotationError), Move::from("Cb1b8".to_string()));
+        assert_eq!(Err(NotationError), Move::from("8".to_string()));
+        assert_eq!(Err(NotationError), Move::from("b".to_string()));
+        assert_eq!(Err(NotationError), Move::from("Q".to_string()));
+    }
 }

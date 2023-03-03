@@ -2,7 +2,7 @@ use std::{error::Error, fmt};
 
 pub type ColRow = (i8, i8);
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ChessError {
     NotationError,
     IllegalMoveError,

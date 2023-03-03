@@ -1,5 +1,6 @@
 use crate::types::ChessError;
 
+#[derive(Debug, PartialEq)]
 pub enum Piece {
     King,
     Queen,
@@ -10,14 +11,15 @@ pub enum Piece {
 }
 
 impl Piece {
-    fn from(item: char) -> Result<Self, ChessError> {
-        match item {
-            'K' => Ok(Self::King),
-            'Q' => Ok(Self::Queen),
-            'R' => Ok(Self::Rook),
-            'B' => Ok(Self::Bishop),
-            'N' => Ok(Self::Knight),
+    pub fn char_to_piece(c: char) -> Result<Self, ChessError> {
+        let res = match c {
+            'K' => Ok(Piece::King),
+            'Q' => Ok(Piece::Queen),
+            'R' => Ok(Piece::Rook),
+            'B' => Ok(Piece::Bishop),
+            'N' => Ok(Piece::Knight),
             _ => Err(ChessError::NotationError),
-        }
+        };
+        res
     }
 }

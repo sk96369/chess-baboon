@@ -1,4 +1,4 @@
-use crate::{piece::Piece, chess_move::Move, types::{ChessError}};
+use crate::{piece::Piece, chess_move::Move, types::{ColRow, ChessError}};
 
 pub struct BoardState {
     squares: Vec<Option<Piece>>,
@@ -6,13 +6,14 @@ pub struct BoardState {
 
 impl BoardState {
     pub fn new() -> Self {
-        BoardState {
-            squares: vec![
-        }
+        let mut start_state = BoardState {
+            squares: vec![],
+        };
+        start_state.push_back(
     }
 
     pub fn next_move(&self, search_depth: u8) -> Move {
-        Move::from("next_move")
+        
     }
 
     pub fn make_move(self, chess_move: Move) -> Result<BoardState, ChessError> {
@@ -21,13 +22,6 @@ impl BoardState {
         Ok(new_state)
     }
 
-    fn get_squares(&self, ColRow) {
+    fn get_squares(&self, loc: ColRow) -> Vec<&Option<Piece>> {
         self.
-}
-
-#[test]
-fn legal_move_simple() {
-    let start_state = BoardState::from("8/8/8/5p2/4P3/8/8/K3k3 w");
-    let new_move = Move::from("e4x1");
-    assert_ne!(IllegalMoveError, new_move);
 }
