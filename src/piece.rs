@@ -1,7 +1,24 @@
+use std::ops::Deref;
+
 use crate::types::ChessError;
 
+#[derive(PartialEq, Debug)]
+pub struct Piece {
+    piece_type: PieceType,
+    // -1 = black, 1 = white. Helps with pawn movement math
+    team: i8,
+}
+
+impl Deref for Piece {
+    type Target = PieceType;
+
+    fn deref(&self) -> &Self::Target {
+        &self.piece_type
+    }
+}
+
 #[derive(Debug, PartialEq)]
-pub enum Piece {
+pub enum PieceType {
     King,
     Queen,
     Rook,
@@ -10,14 +27,14 @@ pub enum Piece {
     Pawn,
 }
 
-impl Piece {
-    pub fn char_to_piece(c: char) -> Result<Self, ChessError> {
+impl PieceType {
+    pub fn from(c: char) -> Result<Self, ChessError> {
         let res = match c {
-            'K' => Ok(Piece::King),
-            'Q' => Ok(Piece::Queen),
-            'R' => Ok(Piece::Rook),
-            'B' => Ok(Piece::Bishop),
-            'N' => Ok(Piece::Knight),
+            'K' => Ok(PieceType::King),
+            'Q' => Ok(PieceType::Queen),
+            'R' => Ok(PieceType::Rook),
+            'B' => Ok(PieceType::Bishop),
+            'N' => Ok(PieceType::Knight),
             _ => Err(ChessError::NotationError),
         };
         res

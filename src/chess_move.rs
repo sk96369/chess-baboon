@@ -1,9 +1,9 @@
-use crate::{types::{ChessError::{self, NotationError}, ColRow}, piece::Piece::{self, Pawn}};
+use crate::{types::{ChessError::{self, NotationError}, ColRow}, piece::{Piece, PieceType::{self, Pawn}}};
 use std::fmt;
 
 #[derive(Debug, PartialEq)]
 pub struct Move {
-    pub piece: Piece,
+    pub piece: PieceType,
     pub move_str: String,
     pub start_col: Option<i8>,
     pub start_row: Option<i8>,
@@ -48,7 +48,7 @@ impl Move {
                 };
             }
             if c.is_uppercase() {
-                new_move.piece = match Piece::char_to_piece(c) {
+                new_move.piece = match PieceType::from(c) {
                     Ok(p) => p,
                     Err(e) => return Err(e),
                 }
@@ -56,7 +56,7 @@ impl Move {
                 if c.is_lowercase() {
                     new_move.start_col = Some(c as i8 - 'a' as i8);
                     if let Some(c) = it.next() {
-                        new_move.piece = match Piece::char_to_piece(c) {
+                        new_move.piece = match PieceType::from(c) {
                             Ok(p) => p,
                             Err(e) => return Err(e),
                         }

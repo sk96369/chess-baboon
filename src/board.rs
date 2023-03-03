@@ -4,6 +4,12 @@ pub struct BoardState {
     squares: Vec<Option<Piece>>,
 }
 
+impl Clone for BoardState {
+    fn clone() -> Self {
+
+    }
+}
+
 impl BoardState {
     pub fn new() -> Self {
         let mut start_state = BoardState {
