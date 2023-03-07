@@ -126,7 +126,7 @@ mod tests {
             end: Some((6, 5))
         });
         assert_eq!(Move::from("Rc2".to_string()).unwrap(), Move {
-            piece: Piece::Rook,
+            piece: PieceType::Rook,
             move_str: "Rc2".to_string(),
             start_col: None,
             start_row: None,

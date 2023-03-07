@@ -1,6 +1,21 @@
 use std::ops::Deref;
+use phf::phf_map;
 
 use crate::types::ChessError;
+
+static PIECETYPES: phf::Map<&'static str, PieceType> = phf_map! {
+    'K' => PieceType::King,
+    'k' => PieceType::King,
+    'Q' => PieceType::Queen,
+    'q' => PieceType::Queen,
+    'R' => PieceType::Rook,
+    'r' => PieceType::Rook,
+    'B' => PieceType::Bishop,
+    'b' => PieceType::Bishop,
+    'N' => PieceType::Knight,
+    'n' => PieceType::Knight,
+};
+
 
 #[derive(PartialEq, Debug)]
 pub struct Piece {
@@ -8,6 +23,26 @@ pub struct Piece {
     // -1 = black, 1 = white. Helps with pawn movement math
     team: i8,
 }
+
+impl Piece {
+    //used for reading positions, where each piece has a team
+    fn from(c: char) -> Result<Self, ChessError> {
+        if let Some(piece_type) = PIECETYPES.get(c) {
+            Ok(Piece {
+                piece_type: piece_type.clone(),
+                team: match c.is_uppercase() {
+                    true => 1,
+                    false => -1,
+                },
+            })
+        } else {
+            Err(ChessError)
+        }
+    }
+}
+
+
+
 
 impl Deref for Piece {
     type Target = PieceType;
@@ -17,7 +52,7 @@ impl Deref for Piece {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum PieceType {
     King,
     Queen,
@@ -28,14 +63,10 @@ pub enum PieceType {
 }
 
 impl PieceType {
+    //used for reading moves, where the piece's team is implied
     pub fn from(c: char) -> Result<Self, ChessError> {
         let res = match c {
-            'K' => Ok(PieceType::King),
-            'Q' => Ok(PieceType::Queen),
-            'R' => Ok(PieceType::Rook),
-            'B' => Ok(PieceType::Bishop),
-            'N' => Ok(PieceType::Knight),
-            _ => Err(ChessError::NotationError),
+                        _ => Err(ChessError::NotationError),
         };
         res
     }
